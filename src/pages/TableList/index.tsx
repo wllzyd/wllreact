@@ -136,7 +136,7 @@ const TableList: React.FC = () => {
       title: <FormattedMessage id="pages.stu.sex" defaultMessage="性别" />,
       dataIndex: 'sex',
       valueEnum: {
-        '0': { text: "女", status: 'Warning' },
+        '2': { text: "女", status: 'Warning' },
         '1': { text: "男", status: 'Processing' },
       }
 

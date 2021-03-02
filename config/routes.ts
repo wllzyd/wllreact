@@ -25,20 +25,19 @@ export default [
   },
   {
     path:"/base",
-    layout:false,
-    routes:[
+    name:'基本数据维护',
+    icon: 'dashboard',
+    routes: [
+      // dashboard
+      
       {
-        path: '/base',
-        routes: [
-          {
-            name: 'login',
-            path: '/base/stuTable',
-            component: './StuTable',
-          },
-        ],
+        name: '学生维护',
+        icon: 'dashboard',
+        path: '/base/stuTable',
+        component: './stuTable',
       },
-    ]
-  },
+    ]},
+      
   {
     name: 'table',
     icon: 'table',
