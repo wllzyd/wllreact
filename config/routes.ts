@@ -1,4 +1,6 @@
-﻿export default [
+﻿import { layout } from "@/app";
+
+export default [
   {
     path: '/user',
     layout: false,
@@ -20,6 +22,22 @@
     name: 'welcome',
     icon: 'crown',
     component: './Welcome',
+  },
+  {
+    path:"/base",
+    layout:false,
+    routes:[
+      {
+        path: '/base',
+        routes: [
+          {
+            name: 'login',
+            path: '/base/stuTable',
+            component: './StuTable',
+          },
+        ],
+      },
+    ]
   },
   {
     name: 'table',

@@ -13,7 +13,7 @@ export default () => (
         blankTarget: true,
       },
       {
-        key: 'github',
+        key: '至爱',
         title: <HeartTwoTone twoToneColor="#eb2f96" />,
         href: '#',
         blankTarget: true,
