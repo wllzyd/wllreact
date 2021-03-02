@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { PageLoading } from '@ant-design/pro-layout';
 import { notification } from 'antd';
 import type { RequestConfig, RunTimeLayoutConfig } from 'umi';
@@ -112,5 +112,6 @@ const errorHandler = (error: ResponseError) => {
 // https://umijs.org/zh-CN/plugins/plugin-request
 export const request: RequestConfig = {
   errorHandler,
-  prefix:'http://localhost:8888/'
+  //prefix:'http://localhost:8888/'
+  prefix:'http://81.68.196.19/wll/'
 };
