@@ -68,5 +68,5 @@ export default {
   'pages.stu.amount':'学习币',
   'pages.stu.grade':'年级',
   'pages.stu.table':'学习币',
-  
+  'pages.stu.tableManger':'学习币管理',
 };

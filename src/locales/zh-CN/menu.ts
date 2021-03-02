@@ -1,4 +1,5 @@
 export default {
+  'menu.table': '学习币管理',
   'menu.welcome': '宝贝',
   'menu.more-blocks': '更多区块',
   'menu.home': '首页',

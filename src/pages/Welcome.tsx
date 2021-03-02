@@ -20,7 +20,7 @@ export default (): React.ReactNode => {
 
         <Image
       width={200}
-      src="https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png"
+      src="/2323.jpg"
     />
       </Card>
     </PageContainer>

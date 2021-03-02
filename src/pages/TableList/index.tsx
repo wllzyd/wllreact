@@ -5,7 +5,12 @@ import { useIntl, FormattedMessage } from 'umi';
 import { PageContainer, FooterToolbar } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
-import { ModalForm, ProFormText, ProFormTextArea } from '@ant-design/pro-form';
+import ProForm, {
+  ModalForm,
+  ProFormText,
+  ProFormDigit,
+  ProFormSelect,
+}  from '@ant-design/pro-form';
 import type { ProDescriptionsItemProps } from '@ant-design/pro-descriptions';
 import ProDescriptions from '@ant-design/pro-descriptions';
 import type { FormValueType } from './components/UpdateForm';
@@ -84,15 +89,16 @@ const TableList: React.FC = () => {
   const [createModalVisible, handleModalVisible] = useState<boolean>(false);
   /** 分布更新窗口的弹窗 */
   const [updateModalVisible, handleUpdateModalVisible] = useState<boolean>(false);
-
+  //知识币列表
   const[coinList,setCoinList] = useState([{id:0,createtime:'',amount:0,cause:'',state:1,loading:true}])
-
+  //右侧抽屉
   const [showDetail, setShowDetail] = useState<boolean>(false);
-  const [drawerTitle, setDrawerTitle] = useState<string>('');
+  //抽屉标题
+  const [drawerTitle, setDrawerTitle] = useState<string>('tom');
   
 
   const actionRef = useRef<ActionType>();
-  const [currentRow, setCurrentRow] = useState<API.RuleListItem>();
+  const [currentRow, setCurrentRow] = useState({name:'tom',key:1});
   const [selectedRowsState, setSelectedRows] = useState<API.RuleListItem[]>([]);
 
 
@@ -115,7 +121,7 @@ const TableList: React.FC = () => {
         return (
           <a
             onClick={async () => {
-              //setCurrentRow(entity);
+              setCurrentRow(entity);
               setShowDetail(true);
               setCoinList(await stuAllCoin(entity.id)) 
               setDrawerTitle(entity?.name??'')
@@ -141,13 +147,15 @@ const TableList: React.FC = () => {
       dataIndex: 'amount',
       sorter: (a, b) => a.amount - b.amount,
       hideInForm: true,
+      hideInSearch:true,
       renderText: (val: string) =>
         `${val} 枚`,
     },
     {
       title: <FormattedMessage id="pages.stu.grade" defaultMessage="年级" />,
       dataIndex: 'grade',
-      //hideInForm: true,
+      hideInForm: true,
+      hideInSearch:true,
       valueType: 'text'
     },
     {
@@ -187,17 +195,22 @@ const TableList: React.FC = () => {
           </Button>,
         ]}
         // request={getStu}
-        request={async (res) => { return await getStu(res) }}
+        request={async (res) => { 
+          console.log(res); 
+          return await getStu(res) 
+        }}
         columns={columns}
 
       />
       
       <ModalForm
-        title='添加/扣除知识币'
-        width="400px"
+        title={`添加/扣除知识币(${drawerTitle})`}
+        width={400}
         visible={createModalVisible}
         onVisibleChange={handleModalVisible}
         onFinish={async (value) => {
+          value.id =currentRow.key;
+          console.log(value)
           const success = await handleAdd(value as API.RuleListItem);
           if (success) {
             handleModalVisible(false);
@@ -207,26 +220,50 @@ const TableList: React.FC = () => {
           }
         }}
       >
+        <ProForm.Group>
+          
+        <ProFormSelect
+          options={[
+            {
+              value: '1',
+              label: '李老师',
+            },
+            {
+              value: '2',
+              label: '张老师',
+            },
+          ]}
+          label="操作人"
+          width={90}
+          name="tidfk"
+          
+        />
+
+        <ProFormSelect
+          options={[
+            {
+              value: '1',
+              label: '增加',
+            },
+          ]}
+          label="知识币状态"
+          width={90}
+          name="state"
+          
+        />
+        <ProFormDigit name="amount" label="数量"  width={90} min={1}/>
+        
+        </ProForm.Group>
+        <ProForm.Group >
+        </ProForm.Group>
+        
+
+        
+
+     
         
       </ModalForm>
-      <UpdateForm
-        onSubmit={async (value) => {
-          const success = await handleUpdate(value);
-          if (success) {
-            handleUpdateModalVisible(false);
-            setCurrentRow(undefined);
-            if (actionRef.current) {
-              actionRef.current.reload();
-            }
-          }
-        }}
-        onCancel={() => {
-          handleUpdateModalVisible(false);
-          setCurrentRow(undefined);
-        }}
-        updateModalVisible={updateModalVisible}
-        values={currentRow || {}}
-      />
+     
 
       <Drawer
         width={400}
