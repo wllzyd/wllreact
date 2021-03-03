@@ -16,7 +16,7 @@ import ProDescriptions from '@ant-design/pro-descriptions';
 import type { FormValueType } from './components/UpdateForm';
 import UpdateForm from './components/UpdateForm';
 
-import { getStu, removeStu, addStu, updateStu,stuAllCoin } from '@/services/ant-design-pro/stu'
+import { getStuCoin,stuAllCoin } from '@/services/ant-design-pro/stu'
 
 
 /**
@@ -194,10 +194,10 @@ const TableList: React.FC = () => {
             <PlusOutlined /> <FormattedMessage id="pages.searchTable.new" defaultMessage="新建" />
           </Button>,
         ]}
-        // request={getStu}
+        // request={getStuCoin}
         request={async (res) => { 
           console.log(res); 
-          return await getStu(res) 
+          return await getStuCoin(res) 
         }}
         columns={columns}
 

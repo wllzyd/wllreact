@@ -8,6 +8,7 @@ import routes from './routes';
 const { REACT_APP_ENV } = process.env;
 
 export default defineConfig({
+  history: {type:'hash'},
   hash: true,
   antd: {},
   dva: {
@@ -20,6 +21,8 @@ export default defineConfig({
     ...defaultSettings,
   },
   // https://umijs.org/zh-CN/plugins/plugin-locale
+  publicPath:"/wllui/",
+  base:"/wllui/",
   locale: {
     // default zh-CN
     default: 'zh-CN',

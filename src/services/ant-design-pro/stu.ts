@@ -1,7 +1,7 @@
 import { request } from 'umi';
 
 //获取学生： 参数：当前页 和页大小
-export  async function getStu(
+export  async function getStuCoin(
     params: {
       // query
       /** 当前的页码 */
@@ -19,19 +19,19 @@ export  async function getStu(
        )
 };
 
-export async function addStu(params:{}) {
 
-    
+export async function getStu(params:{}) {
+
+    return request("stu/getStudentAll",{params})
 }
 
-export async function updateStu(params:{}) {
+export async function saveStu(params:{}) {
 
-    
+    return request("stu/saveStudent",{method:"POST",data:params})
 }
 
-export async function removeStu(params:{}) {
-
-    
+export async function removeStu(id:number) {
+    return request("stu/deleteStudent/"+id,{method:"DELETE"})
 }
 
 export async function stuAllCoin(id:number) {
