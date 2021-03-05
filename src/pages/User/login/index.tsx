@@ -11,7 +11,7 @@ import React, { useState } from 'react';
 import ProForm, { ProFormCaptcha, ProFormCheckbox, ProFormText } from '@ant-design/pro-form';
 import { useIntl, Link, history, FormattedMessage, SelectLang } from 'umi';
 import Footer from '@/components/Footer';
-import { login, getFakeCaptcha } from '@/services/ant-design-pro/login';
+import { login } from '@/services/ant-design-pro/login';
 
 import styles from './index.less';
 
@@ -72,7 +72,7 @@ const Login: React.FC = () => {
         <div className={styles.top}>
           <div className={styles.header}>
             <Link to="/">
-              <img alt="logo" className={styles.logo} src="/logo.svg" />
+              <img alt="logo" className={styles.logo} src="http://81.68.196.19/wllui/logo.svg" />
               <span className={styles.title}>温璐璐</span>
             </Link>
           </div>
@@ -251,12 +251,12 @@ const Login: React.FC = () => {
                     },
                   ]}
                   onGetCaptcha={async (phone) => {
-                    const result = await getFakeCaptcha({
+                    /*const result = await getFakeCaptcha({
                       phone,
                     });
                     if (result === false) {
                       return;
-                    }
+                    }*/
                     message.success('获取验证码成功！验证码为：1234');
                   }}
                 />

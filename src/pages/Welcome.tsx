@@ -20,7 +20,7 @@ export default (): React.ReactNode => {
 
         <Image
       width={200}
-      src="/2323.jpg"
+      src="http://81.68.196.19/wllui/2323.jpg"
     />
       </Card>
     </PageContainer>

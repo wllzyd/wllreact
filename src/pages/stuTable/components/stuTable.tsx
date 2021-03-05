@@ -1,30 +1,29 @@
 import React, { Component } from 'react';
-import {  Card ,Table,Space,Tag,Popconfirm,Modal,message,Tooltip,Button,Form,Radio,Select,Input} from 'antd';
+import {  Card ,Table,Space,Tag,Popconfirm,Modal,message,Tooltip,Button,Radio,Select,Input,Row, Col} from 'antd';
 import PubSub from 'pubsub-js';
 import { WomanOutlined,ManOutlined ,PlusCircleFilled} from '@ant-design/icons';
-import { removeStu, getStu,saveStu } from '@/services/ant-design-pro/stu'
-const sexOption = [
-    { label: '男', value: 1 },
-    { label: '女', value: 2 }
-  ]
-  const flagOption = [
-    { label: '在校', value: 1 },
-    { label: '离校', value: 2 }
-  ]
-  const { Option } = Select;
+import { removeStu, getStu,saveStu } from '@/services/ant-design-pro/stu';
+
+const {Option} = Select;
+const stuInit ={
+  flag:1,
+  sex:1,
+  grade:"初中",
+  name:""
+};
 class StuTable extends Component {
     //#region 
-    formRef = React.createRef<FormInstance>()||{};
-    state = {data:[{
-        key: 1,
-        name: 'John Brown',
-        sex: 1,
-        grade: '初中',
-        flag: 1,
-      }],
-      currentStu:null,
+    
+    state = {data:[],
+      currentStu:{
+        flag:1,
+        sex:1,
+        grade:"初中",
+        name:""
+      },
       isModalShow:false,
-      saveLoading:false
+      saveLoading:false,
+      titleFlag:1,
     }
     columns = [
         {
@@ -74,16 +73,17 @@ class StuTable extends Component {
             <Space size="middle">
               <a onClick={
                 ()=>{
-                    this.setState({isModalShow:true,currentStu:record})
+                    this.setState({isModalShow:true,currentStu:record,titleFlag:2})
+
                 }
               }>
                   编辑 
               </a>
               <Popconfirm
                 title="确定要删除么?"
-                onConfirm={(record)=>{
+                onConfirm={()=>{
                     const dataSource = [...this.state.data]
-                    this.setState({data:dataSource.filter((item)=>item.key==record.key)}, async()=>{await removeStu(record.key) })
+                    this.setState({data:dataSource.filter((item)=>item.key!=record.key)}, async()=>{await removeStu(record.key) })
                     message.success('删除成功');
                 }}
                 //onCancel={cancel}
@@ -100,66 +100,90 @@ class StuTable extends Component {
     
  
     render() {
-        const {currentStu,isModalShow,saveLoading} = this.state;
+        const {currentStu,isModalShow,saveLoading,titleFlag} = this.state;
         return (
             <>
                 <Card>
                     <Tooltip title="添加学生">
-                        <Button type="primary" onClick={()=>this.setState({isModalShow:true})} shape="round"  icon={<PlusCircleFilled />} children="添加学生"/>
+                        <Button type="primary" onClick={()=>this.setState({isModalShow:true,titleFlag:1})} shape="round"  icon={<PlusCircleFilled />} children="添加学生"/>
                     </Tooltip>
                     
                     <Table columns={this.columns} dataSource={this.state.data} />
-                    <Modal title={!currentStu?"添加用户":"修改用户"} visible={isModalShow} footer={null} onOk={this.saveStuData} onCancel={()=>{this.setState({isModalShow:false,currentStu:null})}}  confirmLoading={saveLoading}>
-                    <Card>
-          <Form
-            initialValues={{
-              sex:1,
-              grade:'初中'
-            }
-            }
-            name="control-ref"
-            ref={this.formRef}
-            layout="inline"
-            onFinish={(value)=>{ 
-              console.log(value); 
-              PubSub.publish('search',value)
-            }}
-            onFinishFailed={(err)=>{}}
-            
-          >
-            
-            <Form.Item label="姓名" name = 'name'>
-              <Input  allowClear/>
-            </Form.Item>
-            <Form.Item label="年级" name = 'grade'>
-              <Select  style={{ width: 120 }}  allowClear>
-                <Option value="小学">小学</Option>
-                <Option value="初中">初中</Option>
-                <Option value="高中">高中</Option>
-              </Select>
-            </Form.Item>
-            <Form.Item label="性别" name = 'sex'>
-              <Radio.Group
-                options={sexOption}
-                optionType="button"
-                buttonStyle="solid"
-              />
-            </Form.Item>
-
-            <Form.Item label="是否在校" name = 'flag'>
-              <Radio.Group
-                options={flagOption}
-                optionType="button"
-                buttonStyle="solid"
-              />
-            </Form.Item>
-
-            <Form.Item >
-              <Button type="primary" htmlType="submit">Submit</Button>
-            </Form.Item>
-
-          </Form>
-        </Card>
+                    <Modal 
+                      title={titleFlag==1?"添加学生":"修改学生"} 
+                      visible={isModalShow}  
+                      width={300}
+                      onOk={this.saveStuData}
+                      okText="保存" 
+                      onCancel={()=>{this.setState({
+                        isModalShow:false,
+                        currentStu:{
+                          flag:1,
+                          sex:1,
+                          grade:"初中",
+                          name:""
+                        }
+                      })}}  
+                      confirmLoading={saveLoading}
+                    >
+                        <Row gutter={[16, 16]}>
+                        
+                          <Col span={24}>
+                            姓名：
+                            <Input 
+                              onChange={(e)=> this.setState({ currentStu:{...currentStu,name:e.target.value}})}
+                              value={currentStu.name} 
+                              style={{width:"47%"}}
+                            />
+                          </Col>
+                          <Col span={24}>
+                            年级：
+                            <Select defaultValue={currentStu.grade} style={{ width: 120 }} allowClear onChange={(e)=>{
+                              
+                              this.setState({currentStu:{...currentStu,grade:e}})
+                            }}>
+                              <Option value="小学">小学</Option>
+                              <Option value="初中">初中</Option>
+                              <Option value="高中">高中</Option>
+                            </Select>
+                          </Col>
+                          <Col span={24}>
+                            性别：
+                            <Radio.Group defaultValue={currentStu.sex}
+                              options={[
+                                {label:"男",value:1},
+                                {label:"女",value:2},
+                              ]}
+                              onChange={(e)=>{
+                                
+                                this.setState(
+                                  {
+                                    currentStu:{ ...currentStu,sex:e.target.value}
+                                  })
+                              }}
+                              optionType="button"
+                              buttonStyle="solid"
+                            />
+                          </Col>
+                          <Col span={24}>
+                            状态：
+                            <Radio.Group defaultValue={currentStu.flag}
+                              options={[
+                                {label:"在校",value:1},
+                                {label:"离校",value:2},
+                              ]}
+                              onChange={(e)=>{
+                                
+                                this.setState(
+                                  {
+                                    currentStu:{ ...currentStu,flag:e.target.value}
+                                  })
+                              }}
+                              optionType="button"
+                              buttonStyle="solid"
+                            />
+                          </Col>
+                        </Row>
                         
                     </Modal>
                 </Card>
@@ -167,17 +191,26 @@ class StuTable extends Component {
         );
     }
     saveStuData = async()=>{
+      
         this.setState({saveLoading:true})
         await saveStu(this.state.currentStu);
         message.success('保存成功');
-        this.setState({saveLoading:false,currentStu:null})
+        const {data}  = await getStu()
+        this.setState({saveLoading:false,currentStu:stuInit,isModalShow:false,data})
     }
 
-    componentDidMount(){
+    async componentDidMount(){
+        
+            const result = await getStu()
+            this.setState({data:result.data})
         PubSub.subscribe("search",async(_,msg:{})=>{
+          
             const data = await getStu(msg);
-            this.setState({data})
+            this.setState({data:data.data})
         })
+    }
+    componentWillUnmount(){
+      PubSub.unsubscribe("search")
     }
 }
 

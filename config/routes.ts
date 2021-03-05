@@ -25,16 +25,20 @@ export default [
   },
   {
     path:"/base",
-    name:'基本数据维护',
+    name:'base',
     icon: 'dashboard',
     routes: [
       // dashboard
       
       {
-        name: '学生维护',
-        icon: 'dashboard',
+        name: 'stu',
         path: '/base/stuTable',
-        component: './stuTable',
+        component: './StuTable',
+      },
+      {
+        name: 'teacher',
+        path: '/base/TeacherTable',
+        component: './Teacher',
       },
     ]},
       
@@ -46,7 +50,7 @@ export default [
   },
   {
     path: '/',
-    redirect: '/welcome',
+    redirect: '/list',
   },
   {
     component: './404',

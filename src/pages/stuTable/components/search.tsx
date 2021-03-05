@@ -2,15 +2,9 @@ import React, { Component } from 'react';
 import { Form, Input, Button, Radio,Select, Card } from 'antd';
 import { FormInstance } from 'antd/lib/form';
 import PubSub from 'pubsub-js';
+import { SearchOutlined } from '@ant-design/icons';
 
-const sexOption = [
-  { label: '男', value: 1 },
-  { label: '女', value: 2 }
-]
-const flagOption = [
-  { label: '在校', value: 1 },
-  { label: '离校', value: 2 }
-]
+
 const { Option } = Select;
 class search extends Component {
     
@@ -24,8 +18,8 @@ class search extends Component {
         <Card>
           <Form
             initialValues={{
-              sex:1,
-              grade:'初中'
+              sex:'',
+              grade:''
             }
             }
             name="control-ref"
@@ -50,29 +44,21 @@ class search extends Component {
               </Select>
             </Form.Item>
             <Form.Item label="性别" name = 'sex'>
-              <Radio.Group
-                options={sexOption}
-                //onChange={this.onChange4}
-                //value={sex}
-                //defaultValue={sex}
-                optionType="button"
-                buttonStyle="solid"
-              />
+              <Select  style={{ width: 120 }}  allowClear>
+                <Option value="1">男</Option>
+                <Option value="2">女</Option>
+              </Select>
             </Form.Item>
 
             <Form.Item label="是否在校" name = 'flag'>
-              <Radio.Group
-                options={flagOption}
-                //onChange={this.onChange4}
-                //value={sex}
-                //defaultValue={sex}
-                optionType="button"
-                buttonStyle="solid"
-              />
+              <Select  style={{ width: 120 }}  allowClear>
+                <Option value="1">在校</Option>
+                <Option value="2">离校</Option>
+              </Select>
             </Form.Item>
 
             <Form.Item >
-              <Button type="primary" htmlType="submit">Submit</Button>
+              <Button type="primary" htmlType="submit" icon={<SearchOutlined/>}>搜索</Button>
             </Form.Item>
 
             

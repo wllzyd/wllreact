@@ -10,79 +10,17 @@ import ProForm, {
   ProFormText,
   ProFormDigit,
   ProFormSelect,
+  ProFormDatePicker,
+  ProFormTextArea
 }  from '@ant-design/pro-form';
-import type { ProDescriptionsItemProps } from '@ant-design/pro-descriptions';
-import ProDescriptions from '@ant-design/pro-descriptions';
-import type { FormValueType } from './components/UpdateForm';
-import UpdateForm from './components/UpdateForm';
-
-import { getStuCoin,stuAllCoin } from '@/services/ant-design-pro/stu'
 
 
-/**
- * 添加节点
- *
- * @param fields
- */
-const handleAdd = async (fields: API.RuleListItem) => {
-  const hide = message.loading('正在添加');
-  try {
-    await addStu({ ...fields });
-    hide();
-    message.success('添加成功');
-    return true;
-  } catch (error) {
-    hide();
-    message.error('添加失败请重试！');
-    return false;
-  }
-};
+import { getStuCoin,stuAllCoin,saveCoin} from '@/services/ant-design-pro/stu'
+import {teacherAll} from '@/services/ant-design-pro/teacher'
 
-/**
- * 更新节点
- *
- * @param fields
- */
-const handleUpdate = async (fields: FormValueType) => {
-  const hide = message.loading('正在配置');
-  try {
-    await updateStu({
-      name: fields.name,
-      desc: fields.desc,
-      key: fields.key,
-    });
-    hide();
 
-    message.success('配置成功');
-    return true;
-  } catch (error) {
-    hide();
-    message.error('配置失败请重试！');
-    return false;
-  }
-};
 
-/**
- * 删除节点
- *
- * @param selectedRows
- */
-const handleRemove = async (selectedRows: API.RuleListItem[]) => {
-  const hide = message.loading('正在删除');
-  if (!selectedRows) return true;
-  try {
-    await removeStu({
-      key: selectedRows.map((row) => row.key),
-    });
-    hide();
-    message.success('删除成功，即将刷新');
-    return true;
-  } catch (error) {
-    hide();
-    message.error('删除失败，请重试');
-    return false;
-  }
-};
+
 
 const TableList: React.FC = () => {
   /** 新建窗口的弹窗 */
@@ -94,15 +32,21 @@ const TableList: React.FC = () => {
   //右侧抽屉
   const [showDetail, setShowDetail] = useState<boolean>(false);
   //抽屉标题
-  const [drawerTitle, setDrawerTitle] = useState<string>('tom');
+  const [drawerTitle, setDrawerTitle] = useState<string>('');
   
 
   const actionRef = useRef<ActionType>();
-  const [currentRow, setCurrentRow] = useState({name:'tom',key:1});
+  const [currentRow, setCurrentRow] = useState({name:'',key:1,id:''});
   const [selectedRowsState, setSelectedRows] = useState<API.RuleListItem[]>([]);
+  const [teachers, setTeachers] = useState([]);
 
-
-
+  React.useEffect(async() => {
+    const data = await teacherAll()
+    const result = data.data.map(t=>{
+      return {label:t.tname,value:t.id}
+    })
+    setTeachers(result);
+  },[])
 
   /** 国际化配置 */
   const intl = useIntl();
@@ -196,7 +140,6 @@ const TableList: React.FC = () => {
         ]}
         // request={getStuCoin}
         request={async (res) => { 
-          console.log(res); 
           return await getStuCoin(res) 
         }}
         columns={columns}
@@ -204,35 +147,27 @@ const TableList: React.FC = () => {
       />
       
       <ModalForm
+        modalProps={{okText:"保存"}}
         title={`添加/扣除知识币(${drawerTitle})`}
         width={400}
         visible={createModalVisible}
         onVisibleChange={handleModalVisible}
         onFinish={async (value) => {
-          value.id =currentRow.key;
-          console.log(value)
-          const success = await handleAdd(value as API.RuleListItem);
-          if (success) {
+          value.stuidfk =currentRow.id;
+          await saveCoin(value);
+          message.success("保存成功")
+          setCoinList(await stuAllCoin(value.stuidfk)) 
             handleModalVisible(false);
             if (actionRef.current) {
               actionRef.current.reload();
             }
-          }
+          
         }}
       >
         <ProForm.Group>
           
         <ProFormSelect
-          options={[
-            {
-              value: '1',
-              label: '李老师',
-            },
-            {
-              value: '2',
-              label: '张老师',
-            },
-          ]}
+          options={teachers}
           label="操作人"
           width={90}
           name="tidfk"
@@ -245,6 +180,10 @@ const TableList: React.FC = () => {
               value: '1',
               label: '增加',
             },
+            {
+              value: '2',
+              label: '减少',
+            },
           ]}
           label="知识币状态"
           width={90}
@@ -252,15 +191,14 @@ const TableList: React.FC = () => {
           
         />
         <ProFormDigit name="amount" label="数量"  width={90} min={1}/>
-        
+        <ProFormDatePicker name="createtime" label="日期" />
+        <ProFormTextArea
+          name="cause"
+          label="原因"
+          placeholder="请输入原因"
+          //fieldProps={inputTextAreaProps}
+        />
         </ProForm.Group>
-        <ProForm.Group >
-        </ProForm.Group>
-        
-
-        
-
-     
         
       </ModalForm>
      

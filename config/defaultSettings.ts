@@ -14,7 +14,7 @@ const Settings: LayoutSettings & {
   colorWeak: false,
   title: '璐璐管理系统',
   pwa: false,
-  logo: '/2323.jpg',
+  logo: 'http://81.68.196.19/wllui/2323.jpg',
   iconfontUrl: '',
 };
 

@@ -1,4 +1,7 @@
 export default {
+  'menu.base':'基本数据维护',
+  'menu.base.stu':'学生信息',
+  'menu.base.teacher':'老师信息',
   'menu.table': '学习币管理',
   'menu.welcome': '宝贝',
   'menu.more-blocks': '更多区块',
