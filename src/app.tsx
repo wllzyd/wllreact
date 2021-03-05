@@ -112,6 +112,6 @@ const errorHandler = (error: ResponseError) => {
 // https://umijs.org/zh-CN/plugins/plugin-request
 export const request: RequestConfig = {
   errorHandler,
-  prefix:'http://localhost:8888/'
-  //prefix:'http://81.68.196.19/wll/'
+  //prefix:'http://localhost:8888/'
+  prefix:'http://81.68.196.19/wll/'
 };
