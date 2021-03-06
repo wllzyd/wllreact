@@ -26,7 +26,6 @@ class search extends Component {
             ref={this.formRef}
             layout="inline"
             onFinish={(value)=>{ 
-              console.log(value); 
               PubSub.publish('search',value)
             }}
             onFinishFailed={(err)=>{}}
@@ -34,7 +33,7 @@ class search extends Component {
           >
             
             <Form.Item label="姓名" name = 'name'>
-              <Input  allowClear/>
+              <Input  allowClear style={{ width: 120 }}/>
             </Form.Item>
             <Form.Item label="年级" name = 'grade'>
               <Select  style={{ width: 120 }}  allowClear>

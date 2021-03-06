@@ -1,10 +1,11 @@
-import { PlusOutlined } from '@ant-design/icons';
+import { CloudUploadOutlined } from '@ant-design/icons';
 import { Button, message, Drawer, Timeline } from 'antd';
 import React, { useState, useRef } from 'react';
 import { useIntl, FormattedMessage } from 'umi';
-import { PageContainer, FooterToolbar } from '@ant-design/pro-layout';
+import { PageContainer } from '@ant-design/pro-layout';
 import type { ProColumns, ActionType } from '@ant-design/pro-table';
 import ProTable from '@ant-design/pro-table';
+import XLSX from 'xlsx'
 import ProForm, {
   ModalForm,
   ProFormText,
@@ -47,6 +48,29 @@ const TableList: React.FC = () => {
     })
     setTeachers(result);
   },[])
+
+  const downloadExcle = async()=>{
+    const data = await getStuCoin({flag:'Y'})
+    if(data.data.length<=0){
+      message.warning("无信息数据")
+      return
+    }
+    const time = new Date()
+    
+    const result =data.data.map((item)=>{
+      return {
+        姓名:item.name,
+        学习币:item.amount,
+        统计时间:time.toLocaleString()
+      }
+    })
+    const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(result);
+
+    const wb: XLSX.WorkBook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, '学习币信息');
+    XLSX.writeFile(wb, '学习币汇总.xlsx'); //直接定义死文件名
+  
+  }
 
   /** 国际化配置 */
   const intl = useIntl();
@@ -131,11 +155,9 @@ const TableList: React.FC = () => {
           <Button
             type="primary"
             key="primary"
-            onClick={() => {
-              handleModalVisible(true);
-            }}
+            onClick={downloadExcle}
           >
-            <PlusOutlined /> <FormattedMessage id="pages.searchTable.new" defaultMessage="新建" />
+            <CloudUploadOutlined /> 导出Excle
           </Button>,
         ]}
         // request={getStuCoin}

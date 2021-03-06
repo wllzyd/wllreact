@@ -6,7 +6,8 @@ class Index  extends Component {
     render() {
         return (
             <>
-                <Search/>
+                <Search />
+                <br/>
                 <StuTable/>
             </>
         );

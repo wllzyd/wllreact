@@ -29,6 +29,13 @@ export async function saveStu(params:{}) {
 
     return request("stu/saveStudent",{method:"POST",data:params})
 }
+
+//保存学生信息
+export async function saveStuList(params:string) {
+
+    return request("stu/saveStudentList",{method:"POST",data:params})
+}
+
 //删除学生
 export async function removeStu(id:number) {
     return request("stu/deleteStudent/"+id,{method:"DELETE"})

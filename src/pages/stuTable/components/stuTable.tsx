@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
-import {  Card ,Table,Space,Tag,Popconfirm,Modal,message,Tooltip,Button,Radio,Select,Input,Row, Col} from 'antd';
+import {  Card ,Table,Space,Tag,Popconfirm,Modal,message,Tooltip,Button,Radio,Select,Input,Row, Col,Upload} from 'antd';
 import PubSub from 'pubsub-js';
-import { WomanOutlined,ManOutlined ,PlusCircleFilled} from '@ant-design/icons';
-import { removeStu, getStu,saveStu } from '@/services/ant-design-pro/stu';
+import { WomanOutlined,ManOutlined ,PlusCircleFilled,UploadOutlined} from '@ant-design/icons';
+import { removeStu, getStu,saveStu,saveStuList } from '@/services/ant-design-pro/stu';
+import XLSX from 'xlsx'
 
 const {Option} = Select;
 const stuInit ={
-  flag:1,
+  flag:'Y',
   sex:1,
   grade:"初中",
   name:""
@@ -16,7 +17,7 @@ class StuTable extends Component {
     
     state = {data:[],
       currentStu:{
-        flag:1,
+        flag:'Y',
         sex:1,
         grade:"初中",
         name:""
@@ -24,6 +25,7 @@ class StuTable extends Component {
       isModalShow:false,
       saveLoading:false,
       titleFlag:1,
+      excleDate:[]
     }
     columns = [
         {
@@ -57,7 +59,7 @@ class StuTable extends Component {
             render:(_,record)=>{
                 
                 let obj = {color:'green',name:"在校"}
-                if(record.flag ==2)
+                if(record.flag =='N')
                     obj={color:'red',name:"离校"}
                 return(
                     
@@ -67,7 +69,7 @@ class StuTable extends Component {
             }
         },
         {
-          title: 'Action',
+          title: '操作',
           key: 'action',
           render: (_, record) => (
             <Space size="middle">
@@ -104,10 +106,29 @@ class StuTable extends Component {
         return (
             <>
                 <Card>
-                    <Tooltip title="添加学生">
-                        <Button type="primary" onClick={()=>this.setState({isModalShow:true,titleFlag:1})} shape="round"  icon={<PlusCircleFilled />} children="添加学生"/>
-                    </Tooltip>
-                    
+                    <Row gutter={[16,16]}>
+                      <Col xs={24} sm={24} md={5} lg={5} xl={3}>
+                        <Tooltip title="添加学生">
+                          <Button type="primary" onClick={()=>this.setState({isModalShow:true,titleFlag:1})} shape="round"  icon={<PlusCircleFilled />} children="添加学生"/>
+                        </Tooltip>
+                      </Col>
+                      <Col xs={24} sm={24} md={5} lg={5} xl={3}>
+                        <Tooltip title="下载此模板批量上传学生信息">
+                          <Button type="primary" onClick={this.downloadModel} shape="round"  icon={<PlusCircleFilled />} children="下载模板"/>
+                        </Tooltip>
+                      </Col>
+                      <Col xs={24} sm={24} md={5} lg={5} xl={3}>
+                        <Tooltip title="需要先下载模板，根据模板格式填写上传">
+                        <Upload beforeUpload={this.saveExcle} maxCount={1} accept='.xlsx'>
+                          <Button icon={<UploadOutlined />} type="primary">批量上传学生</Button>
+                        </Upload>,
+                        </Tooltip>
+                      </Col>
+                      <Col xs={24} sm={24} md={7} lg={7} xl={5} style={{color:'red'}}>
+                        *注意：批量添加会删除已有学生
+                      </Col>
+                    </Row>
+
                     <Table columns={this.columns} dataSource={this.state.data} />
                     <Modal 
                       title={titleFlag==1?"添加学生":"修改学生"} 
@@ -118,7 +139,7 @@ class StuTable extends Component {
                       onCancel={()=>{this.setState({
                         isModalShow:false,
                         currentStu:{
-                          flag:1,
+                          flag:'Y',
                           sex:1,
                           grade:"初中",
                           name:""
@@ -169,8 +190,8 @@ class StuTable extends Component {
                             状态：
                             <Radio.Group defaultValue={currentStu.flag}
                               options={[
-                                {label:"在校",value:1},
-                                {label:"离校",value:2},
+                                {label:"在校",value:'Y'},
+                                {label:"离校",value:'N'},
                               ]}
                               onChange={(e)=>{
                                 
@@ -211,6 +232,51 @@ class StuTable extends Component {
     }
     componentWillUnmount(){
       PubSub.unsubscribe("search")
+    }
+    downloadModel=()=>{
+      const header =[{
+        name:'姓名',
+        sex:'性别',
+        grade:"年级"
+      }]
+      //设置工作簿，表头属性
+      const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(header,{header:['name','sex','grade'],skipHeader: true});
+      //创建book对象
+      const wb: XLSX.WorkBook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, '学生信息');
+      XLSX.writeFile(wb, '学生信息模板.xlsx'); //直接定义死文件名
+    }
+    saveExcle=(file:any)=>{   
+      const that = this;
+      let reader = new FileReader();
+      reader.readAsBinaryString(file);
+      reader.onload =async function(e) {
+        let data = e?.target?.result;
+        //BinaryString格式(byte n is data.charCodeAt(n))
+        let workbook = XLSX.read(data, {type: 'binary'});
+
+        let  sheetNames = workbook.SheetNames; // 工作表名称集合
+        let  worksheet = workbook.Sheets[sheetNames[0]]; // 这里我们只读取第一张sheet 
+        let  json = XLSX.utils.sheet_to_json(worksheet);
+        json = json.map((item:any)=>{
+          return {
+            name:item.姓名,
+            sex:item.性别=='男'?1:2,
+            grade:item.年级,
+            flag:'Y'
+          }
+        })
+        try {
+          await saveStuList(JSON.stringify(json));
+          message.success("批量添加成功");
+          const result = await getStu()
+          that.setState({data:result.data})
+        } catch (error) {
+          message.error("网络繁忙");
+        }
+
+      };
+      return false;
     }
 }
 

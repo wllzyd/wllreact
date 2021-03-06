@@ -33,7 +33,6 @@ const columns: ProColumns<TeacherItem>[] = [
         2:{text:"女"}
     },
     render:(text:any,record:any,index:any,action:any)=>{
-        console.log(record,text)
         return record.sex==1?<ManOutlined style={{color:'#1890ff'}}/>: <WomanOutlined style={{color:'#ff69b4'}}/>
     }
     

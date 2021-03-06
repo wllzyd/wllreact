@@ -1,13 +1,13 @@
 {
   "compilerOptions": {
-    "outDir": "build/dist",
+    "outDir": "build/wllui",
     "module": "esnext",
     "target": "esnext",
     "lib": ["esnext", "dom"],
     "sourceMap": true,
     "baseUrl": "/",
-    //"jsx": "react-jsx",
-    "jsx": "react",
+    "jsx": "react-jsx",
+    //"jsx": "react",
     "allowSyntheticDefaultImports": true,
     "moduleResolution": "node",
     "forceConsistentCasingInFileNames": true,

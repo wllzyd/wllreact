@@ -52,9 +52,9 @@ const Login: React.FC = () => {
         console.log(window.localStorage.getItem("user"))
         //await fetchUserInfo();
         history.push("/")
-
-       
         return;
+      }else{
+        message.error("登录失败！请检查用户名和密码")
       }
       // 如果失败去设置用户错误信息
       setUserLoginState(msg);
@@ -83,8 +83,6 @@ const Login: React.FC = () => {
           <ProForm
             initialValues={{
               autoLogin: true,
-              account:'wll',
-              password:'wll'
             }}
             submitter={{
               searchConfig: {
