@@ -83,6 +83,7 @@ export default () => {
         type: 'single',
         onSave:async(_,row:TeacherItem)=>{
             await teacherSave(row)
+            
         },
         onDelete:async(_,row:TeacherItem)=>{
             await teacherDel(row.id)

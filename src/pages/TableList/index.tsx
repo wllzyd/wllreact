@@ -1,5 +1,5 @@
-import { CloudUploadOutlined } from '@ant-design/icons';
-import { Button, message, Drawer, Timeline } from 'antd';
+import { CloudUploadOutlined,DeleteOutlined,EditOutlined } from '@ant-design/icons';
+import { Button, message, Drawer, Timeline,Tooltip ,Popconfirm} from 'antd';
 import React, { useState, useRef } from 'react';
 import { useIntl, FormattedMessage } from 'umi';
 import { PageContainer } from '@ant-design/pro-layout';
@@ -16,7 +16,7 @@ import ProForm, {
 }  from '@ant-design/pro-form';
 
 
-import { getStuCoin,stuAllCoin,saveCoin} from '@/services/ant-design-pro/stu'
+import { getStuCoin,stuAllCoin,saveCoin,delCoin} from '@/services/ant-design-pro/stu'
 import {teacherAll} from '@/services/ant-design-pro/teacher'
 
 
@@ -34,7 +34,7 @@ const TableList: React.FC = () => {
   const [showDetail, setShowDetail] = useState<boolean>(false);
   //抽屉标题
   const [drawerTitle, setDrawerTitle] = useState<string>('');
-  
+  const [coinRow, setCoinRow] = useState({});
 
   const actionRef = useRef<ActionType>();
   const [currentRow, setCurrentRow] = useState({name:'',key:1,id:''});
@@ -169,13 +169,23 @@ const TableList: React.FC = () => {
       />
       
       <ModalForm
-        modalProps={{okText:"保存"}}
+        modalProps={{okText:"保存",destroyOnClose:true}}
         title={`添加/扣除知识币(${drawerTitle})`}
         width={400}
         visible={createModalVisible}
-        onVisibleChange={handleModalVisible}
+        onVisibleChange={(e)=>{
+          handleModalVisible(e)
+          if(!e)setCoinRow({})
+        }}
+        initialValues={coinRow}
         onFinish={async (value) => {
-          value.stuidfk =currentRow.id;
+          //添加
+          if(JSON.stringify(coinRow)=='{}'){
+            value.stuidfk =currentRow.id;
+          }
+          else{//修改
+            value.id=coinRow.id
+          }
           await saveCoin(value);
           message.success("保存成功")
           setCoinList(await stuAllCoin(value.stuidfk)) 
@@ -187,7 +197,7 @@ const TableList: React.FC = () => {
         }}
       >
         <ProForm.Group>
-          
+        <ProFormText name="stuidfk" hidden  />
         <ProFormSelect
           options={teachers}
           label="操作人"
@@ -199,11 +209,11 @@ const TableList: React.FC = () => {
         <ProFormSelect
           options={[
             {
-              value: '1',
+              value: 1,
               label: '增加',
             },
             {
-              value: '2',
+              value: 2,
               label: '减少',
             },
           ]}
@@ -239,7 +249,30 @@ const TableList: React.FC = () => {
         <Timeline mode='left'>
           {
             coinList.map((item)=>{
-              return <Timeline.Item label={item.createtime} key={item.id}>数量:<span style={{color:item.state==1?'green':'red'}}>{item.state==1?'+':'-'}{item.amount}</span>  <br/> 原因: {item.cause}</Timeline.Item>
+              return <Timeline.Item label={(
+                  <>
+                    <Popconfirm
+                      title="确定要删除么?"
+                      onConfirm={async()=>{
+                        await delCoin(item.id)
+                        message.success("删除成功")
+                        setCoinList(await stuAllCoin(item.stuidfk))
+                      }}
+                      okText="Yes"
+                      cancelText="No"
+                    >
+                      <Tooltip title="删除" color='red' key='del'>
+                        <Button type="link" icon={<DeleteOutlined />} ></Button>
+                      </Tooltip>
+
+                    </Popconfirm>
+                    <Tooltip title="编辑" color='yellow' key='edit'>
+                      <Button type="link" icon={<EditOutlined />} onClick={()=>{handleModalVisible(true);setCoinRow(item);}}></Button>
+                    </Tooltip>
+                    
+                    {item.createtime}
+                  </>
+              )} key={item.id}>数量:<span style={{color:item.state==1?'green':'red'}}>{item.state==1?'+':'-'}{item.amount}</span>  <br/> 原因: {item.cause}</Timeline.Item>
             })
           }
         </Timeline>

@@ -51,3 +51,8 @@ export async function saveCoin(params:{}) {
 
     return request("coin/saveCoin",{method:"POST",data:params})
 }
+//保存学习币
+export async function delCoin(id:number) {
+
+    return request("coin/deleteCoin/"+id,{method:"DELETE"})
+}
